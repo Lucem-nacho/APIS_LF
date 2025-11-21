@@ -8,11 +8,11 @@
 		<version>3.4.12</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.ms_productos</groupId>
-	<artifactId>productos</artifactId>
+	<groupId>com.ms_pedidos</groupId>
+	<artifactId>pedidos</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>productos</name>
-	<description>microservicio que puede tener Catálogo, Stock, Categorías</description>
+	<name>pedidos</name>
+	<description>microservicio que puede Crear orden, Historial, Estados</description>
 	<url/>
 	<licenses>
 		<license/>
