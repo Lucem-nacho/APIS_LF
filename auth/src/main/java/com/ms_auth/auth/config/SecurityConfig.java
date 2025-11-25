@@ -10,6 +10,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.config.http.SessionCreationPolicy; // Importante para la sesión STATELESS
 
 @Configuration
 @EnableWebSecurity
@@ -21,17 +22,29 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+            // Desactivamos CSRF porque usamos Tokens
             .csrf(csrf -> csrf.disable())
+            
+            // Configuración de rutas
             .authorizeHttpRequests(auth -> auth
-                // 1. Rutas públicas (Login, Registro, Validar)
+                // 1. Rutas públicas de Autenticación
                 .requestMatchers("/auth/login", "/auth/register", "/auth/validate").permitAll()
                 
-                // 2. Rutas SOLO para ADMIN (Aquí protegemos la lista)
+                // 2. --- AQUÍ ESTÁ LA SOLUCIÓN PARA SWAGGER (Error 403) ---
+                // Permitimos el acceso a la documentación y la interfaz visual
+                .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                // ---------------------------------------------------------
+
+                // 3. Rutas SOLO para ADMIN
                 .requestMatchers("/auth/list").hasAuthority("ADMIN") 
                 
-                // 3. Rutas para cualquier usuario autenticado (Perfil, etc.)
+                // 4. Cualquier otra ruta requiere Token
                 .anyRequest().authenticated()
             )
+            // Configuramos la sesión como "Sin Estado" (Stateless)
+            .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            
+            // Agregamos el filtro de JWT antes del filtro estándar
             .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
             
         return http.build();
@@ -39,6 +52,6 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(); // Algoritmo seguro para passwords
+        return new BCryptPasswordEncoder(); // Encriptación segura
     }
 }
