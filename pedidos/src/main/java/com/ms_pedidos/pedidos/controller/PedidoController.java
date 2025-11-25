@@ -8,38 +8,34 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/orders")
-@CrossOrigin(origins = "http://localhost:5173")
+// CORS global ya está configurado en el Application.java, pero esto no daña.
+@CrossOrigin(origins = "http://localhost:5173") 
 public class PedidoController {
 
     @Autowired
     private PedidoService pedidoService;
 
-    // 1. Crear Pedido (Cualquier usuario autenticado)
-    // NOTA: En un escenario real, sacaríamos el email del Token.
-    // Por simplicidad ahora, lo pedimos como parámetro o asumimos que el frontend lo manda.
-    // Para hacerlo PRO, deberías implementar JwtFilter aquí también, 
-    // pero por ahora lo pasaremos como parámetro simulando el token.
     @PostMapping
-    public ResponseEntity<Pedido> crear(@RequestParam String email, @RequestBody PedidoDto dto) {
-        return ResponseEntity.ok(pedidoService.crearPedido(email, dto));
+    public ResponseEntity<Pedido> crearPedido(@RequestParam String email, @RequestBody PedidoDto pedidoDto) {
+        return ResponseEntity.ok(pedidoService.crearPedido(email, pedidoDto));
     }
 
-    // 2. Historial de un usuario
     @GetMapping("/my-orders")
-    public ResponseEntity<List<Pedido>> historial(@RequestParam String email) {
+    public ResponseEntity<List<Pedido>> misPedidos(@RequestParam String email) {
         return ResponseEntity.ok(pedidoService.misPedidos(email));
     }
 
-    // 3. Listar TODOs  (Solo Admin debería poder)
+    // --- MÉTODO DEL ADMIN ACTUALIZADO ---
+    // Ahora devuelve List<Map<String, Object>> en vez de Entidades complejas
     @GetMapping("/admin/all")
-    public ResponseEntity<List<Pedido>> todos() {
-        return ResponseEntity.ok(pedidoService.todosLosPedidos());
+    public ResponseEntity<List<Map<String, Object>>> listarTodos() {
+        return ResponseEntity.ok(pedidoService.obtenerResumenPedidosAdmin());
     }
 
-    // 4. Cambiar estado (Admin)
     @PutMapping("/{id}/status")
     public ResponseEntity<Pedido> cambiarEstado(@PathVariable Long id, @RequestParam String estado) {
         return ResponseEntity.ok(pedidoService.cambiarEstado(id, estado));

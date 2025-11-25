@@ -1,25 +1,42 @@
 package com.ms_pedidos.pedidos.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonBackReference; // <--- IMPORTANTE
 import jakarta.persistence.*;
-import lombok.Data;
 
 @Entity
 @Table(name = "detalle_pedidos")
-@Data
 public class DetallePedido {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long productoId; // ID del producto en ms-catalog
-    private String nombreProducto; // Guardamos el nombre por si se borra del catálogo
+    private Long productoId;
+    private String nombreProducto;
     private Integer cantidad;
-    private Double precioUnitario; // Precio al momento de la compra
+    private Double precioUnitario;
 
-    // Relación inversa: Muchos detalles pertenecen a un Pedido
     @ManyToOne
     @JoinColumn(name = "pedido_id")
-    @JsonIgnore // Para evitar bucles infinitos al convertir a JSON
+    @JsonBackReference // <--- ESTO DICE: "No me serialices de vuelta al padre"
     private Pedido pedido;
+
+    // --- GETTERS Y SETTERS ---
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
+    public Long getProductoId() { return productoId; }
+    public void setProductoId(Long productoId) { this.productoId = productoId; }
+
+    public String getNombreProducto() { return nombreProducto; }
+    public void setNombreProducto(String nombreProducto) { this.nombreProducto = nombreProducto; }
+
+    public Integer getCantidad() { return cantidad; }
+    public void setCantidad(Integer cantidad) { this.cantidad = cantidad; }
+
+    public Double getPrecioUnitario() { return precioUnitario; }
+    public void setPrecioUnitario(Double precioUnitario) { this.precioUnitario = precioUnitario; }
+
+    public Pedido getPedido() { return pedido; }
+    public void setPedido(Pedido pedido) { this.pedido = pedido; }
 }

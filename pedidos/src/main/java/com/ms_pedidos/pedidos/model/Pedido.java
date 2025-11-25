@@ -1,36 +1,43 @@
 package com.ms_pedidos.pedidos.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference; // <--- IMPORTANTE
 import jakarta.persistence.*;
-import lombok.Data;
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
 @Table(name = "pedidos")
-@Data
 public class Pedido {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Guardamos el email del usuario para saber de quién es
-    // (Viene del Token en el frontend)
-    private String usuarioEmail; 
-
+    private String usuarioEmail;
+    private Double total;
+    private String estado;
     private LocalDateTime fechaCreacion;
 
-    private String estado; // Ej: "PENDIENTE", "PAGADO", "ENVIADO", "ENTREGADO"
-    
-    private Double total;
-
-    // Relación: Un Pedido tiene muchos Detalles
-    // cascade = ALL significa que si guardo el Pedido, se guardan sus detalles solos
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference // <--- ESTO DICE: "Yo mando, serialízame a mí"
     private List<DetallePedido> detalles;
-    
-    @PrePersist
-    protected void onCreate() {
-        fechaCreacion = LocalDateTime.now();
-        if (estado == null) estado = "PENDIENTE";
-    }
+
+    // --- GETTERS Y SETTERS ---
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
+    public String getUsuarioEmail() { return usuarioEmail; }
+    public void setUsuarioEmail(String usuarioEmail) { this.usuarioEmail = usuarioEmail; }
+
+    public Double getTotal() { return total; }
+    public void setTotal(Double total) { this.total = total; }
+
+    public String getEstado() { return estado; }
+    public void setEstado(String estado) { this.estado = estado; }
+
+    public LocalDateTime getFechaCreacion() { return fechaCreacion; }
+    public void setFechaCreacion(LocalDateTime fechaCreacion) { this.fechaCreacion = fechaCreacion; }
+
+    public List<DetallePedido> getDetalles() { return detalles; }
+    public void setDetalles(List<DetallePedido> detalles) { this.detalles = detalles; }
 }
