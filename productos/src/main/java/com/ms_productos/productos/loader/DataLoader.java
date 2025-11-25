@@ -9,7 +9,6 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
-import java.util.List;
 
 @Component
 public class DataLoader implements CommandLineRunner {
@@ -29,56 +28,87 @@ public class DataLoader implements CommandLineRunner {
         // Solo cargamos si la base de datos está vacía
         if (categoriaRepository.count() == 0) {
             
-            System.out.println(">>> CARGANDO DATOS AUTOMÁTICOS DE MOLDURAS Y CUADROS... <<<");
+            System.out.println(">>> CARGANDO INVENTARIO ANTIGUO (LEGACY FRAMES) ... <<<");
 
-            // 1. CREAR CATEGORÍAS
-            Categoria grecas = new Categoria(); grecas.setNombre("grecas"); grecas.setDescripcion("Diseños clásicos");
-            Categoria rusticas = new Categoria(); rusticas.setNombre("rusticas"); rusticas.setDescripcion("Madera envejecida");
-            Categoria nativas = new Categoria(); nativas.setNombre("nativas"); nativas.setDescripcion("Maderas chilenas");
-            Categoria finger = new Categoria(); finger.setNombre("finger-joint"); finger.setDescripcion("Unión dentada");
+            // --- 1. CREAR CATEGORÍAS (Usando Setters para evitar errores) ---
             
-            // NUEVA CATEGORÍA: CUADROS
-            Categoria cuadros = new Categoria(); cuadros.setNombre("cuadros"); cuadros.setDescripcion("Marcos listos para colgar");
+            Categoria catCuadros = new Categoria();
+            catCuadros.setNombre("cuadros");
+            catCuadros.setDescripcion("Marcos listos para colgar");
 
-            // Guardamos y recuperamos para tener los IDs (El orden importa: Cuadros será el ID 5)
-            List<Categoria> cats = categoriaRepository.saveAll(Arrays.asList(grecas, rusticas, nativas, finger, cuadros));
+            Categoria catGrecas = new Categoria();
+            catGrecas.setNombre("grecas");
+            catGrecas.setDescripcion("Diseños clásicos y elegantes");
+
+            Categoria catRusticas = new Categoria();
+            catRusticas.setNombre("rusticas");
+            catRusticas.setDescripcion("Estilo madera natural y envejecida");
+
+            Categoria catNativas = new Categoria();
+            catNativas.setNombre("nativas");
+            catNativas.setDescripcion("Maderas nobles chilenas");
+
+            Categoria catFinger = new Categoria();
+            catFinger.setNombre("finger-joint");
+            catFinger.setDescripcion("Uniones visibles, estilo moderno");
+
+            Categoria catNaturales = new Categoria();
+            catNaturales.setNombre("naturales");
+            catNaturales.setDescripcion("Acabados suaves y minimalistas");
+
+            // Guardamos las categorías primero
+            categoriaRepository.saveAll(Arrays.asList(catCuadros, catGrecas, catRusticas, catNativas, catFinger, catNaturales));
+
+            // --- 2. CREAR PRODUCTOS (MOLDURAS) ---
             
-            Categoria catGrecas = cats.get(0);
-            Categoria catRusticas = cats.get(1);
-            Categoria catNativas = cats.get(2);
-            Categoria catFinger = cats.get(3);
-            Categoria catCuadros = cats.get(4); // ID 5
+            // Grecas
+            crearProd("I 09 greca zo", "Elegante greca decorativa con diseño tradicional ZO. Ideal para marcos clásicos.", 12500, 50, "/assets/mordura1.png", catGrecas);
+            crearProd("I 09 greca corazón", "Hermosa greca con motivo de corazón, perfecta para marcos románticos.", 14000, 30, "/assets/mordura2.png", catGrecas);
+            crearProd("P 15 greca LA oro", "Greca con acabado dorado, elegante y sofisticada.", 38000, 20, "/assets/moldura3.jpg", catGrecas);
+            crearProd("P 15 greca LA plata", "Greca con acabado plateado, moderna y elegante.", 105000, 35, "/assets/moldura4.jpg", catGrecas);
 
-            // 2. CREAR MOLDURAS (Ejemplos)
-            Producto m1 = crearProd("Moldura Greca Dorada", "Diseño clásico", 20000.0, 50, "/assets/moldura3.jpg", catGrecas);
-            Producto m2 = crearProd("Roble Rústico", "Ambientes cálidos", 22000.0, 30, "/assets/rustica1.jpg", catRusticas);
-            Producto m3 = crearProd("Mañío Chileno", "Madera nativa", 25000.0, 15, "/assets/nativas1.jpg", catNativas);
-            Producto m4 = crearProd("Pino Finger Joint", "Económico", 18000.0, 100, "/assets/finger_joint1.jpg", catFinger);
+            // Rústicas
+            crearProd("H 20 albayalde azul", "Moldura rústica con acabado albayalde azul, ideal para ambientes campestres.", 130000, 45, "/assets/rustica1.jpg", catRusticas);
 
-            // 3. CREAR CUADROS (Tus productos reales)
-            Producto c1 = crearProd("Set de Marcos Familiares", "Conjunto de marcos negros ideales para collage.", 45000.0, 20, "/assets/Frame Picture.png", catCuadros);
-            Producto c2 = crearProd("Marco Minimalista Moderno", "Marco delgado de aluminio negro.", 18990.0, 30, "/assets/fameproxima.png", catCuadros);
-            Producto c3 = crearProd("Marco Dorado Clásico", "Elegancia pura con acabado envejecido.", 32500.0, 15, "/assets/marcoDoradoClasico.png", catCuadros);
-            Producto c4 = crearProd("Marco Madera Rústica", "Madera natural sin tratar estilo boho.", 24990.0, 10, "/assets/marcoRustico.png", catCuadros);
-            Producto c5 = crearProd("Marco para Diploma", "Diseño sobrio para certificados.", 15000.0, 40, "/assets/marco.diplomaa.png", catCuadros);
-            Producto c6 = crearProd("Marco Vintage Tallado", "Marco ancho con detalles tallados a mano.", 55000.0, 5, "/assets/marcoantigo.png", catCuadros);
+            // Nativas
+            crearProd("J-16", "Moldura de madera nativa chilena, resistente y de gran calidad.", 73000, 15, "/assets/nativas1.jpg", catNativas);
 
-            // Guardar todo
-            productoRepository.saveAll(Arrays.asList(m1, m2, m3, m4, c1, c2, c3, c4, c5, c6));
+            // Naturales y Modernas
+            crearProd("B-10 t/alerce", "Moldura natural de alerce con textura original de la madera.", 6500, 100, "/assets/naturales1.jpg", catNaturales);
 
-            System.out.println(">>> ¡BASE DE DATOS LLENA Y LISTA PARA VENDER! <<<");
+            // Finger Joint
+            crearProd("P-12 Finger Joint", "Moldura finger joint de alta calidad con unión invisible.", 47000, 120, "/assets/finger_joint1.jpg", catFinger);
+
+
+            // --- 3. CREAR PRODUCTOS (CUADROS LISTOS) ---
+
+             crearProd("Marco Dorado Clásico", "Elegancia pura con acabado pan de oro envejecido.", 32500, 15, "/assets/marcoDoradoClasico.png", catCuadros);
+            
+            crearProd("Marco Minimalista Moderno", "Diseño contemporáneo y limpio, perfecto para espacios modernos y fotografías actuales.", 18990, 30, "/assets/marco-minimalista-ambiente-moderno_23-2149301885.jpg", catCuadros);
+            
+            crearProd("Marco Rústico de Madera", "Acabado rústico natural, ideal para ambientes campestres y fotografías de naturaleza.", 24990, 10, "/assets/marcoRustico.png", catCuadros);
+            
+            crearProd("Marco para Diplomas", "Especializado en enmarcación de diplomas y certificados importantes con protección UV.", 15000, 40, "/assets/marco.diplomaa.png", catCuadros);
+            
+            crearProd("Marco Vintage Antiguo", "Estilo vintage con detalles ornamentales, perfecto para fotografías familiares clásicas.", 55000, 5, "/assets/marcoantigo.png", catCuadros);
+
+            crearProd("Marco para Camisetas", "Especializado en enmarcación de camisetas deportivas y memorabilia con montaje especial.", 20000, 10, "/assets/polera.1.png", catCuadros);
+
+            System.out.println(">>> ¡INVENTARIO CARGADO CON ÉXITO! <<<");
+        } else {
+            System.out.println(">>> La base de datos ya tiene productos. No se cargaron duplicados. <<<");
         }
     }
 
-    // Método auxiliar para no repetir código
-    private Producto crearProd(String nombre, String desc, Double precio, Integer stock, String img, Categoria cat) {
+    // Método auxiliar para crear productos (Usa setters para ser compatible con cualquier versión de tu modelo)
+    private void crearProd(String nombre, String descripcion, double precio, int stock, String imagen, Categoria categoria) {
         Producto p = new Producto();
         p.setNombre(nombre);
-        p.setDescripcion(desc);
+        p.setDescripcion(descripcion);
         p.setPrecio(precio);
         p.setStock(stock);
-        p.setImagenUrl(img);
-        p.setCategoria(cat);
-        return p;
+        p.setImagenUrl(imagen);
+        p.setCategoria(categoria);
+        productoRepository.save(p);
     }
 }
