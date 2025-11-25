@@ -42,4 +42,22 @@ public class ProductoService {
     public void eliminarProducto(Long id) {
         productoRepository.deleteById(id);
     }
+
+    // MÉTODO NUEVO PARA ACTUALIZAR
+    public Producto actualizarProducto(Long id, Producto productoActualizado) {
+        Producto productoExistente = obtenerProductoPorId(id);
+        
+        if (productoExistente != null) {
+            productoExistente.setNombre(productoActualizado.getNombre());
+            productoExistente.setDescripcion(productoActualizado.getDescripcion());
+            productoExistente.setPrecio(productoActualizado.getPrecio());
+            productoExistente.setStock(productoActualizado.getStock());
+            productoExistente.setImagenUrl(productoActualizado.getImagenUrl());
+            productoExistente.setCategoria(productoActualizado.getCategoria());
+            
+            return productoRepository.save(productoExistente);
+        }
+        return null;
+    }
+
 }

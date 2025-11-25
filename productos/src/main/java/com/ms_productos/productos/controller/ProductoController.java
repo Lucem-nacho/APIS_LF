@@ -83,4 +83,15 @@ public class ProductoController {
         
         return ResponseEntity.ok("Stock actualizado correctamente");
     }
+
+    // MÉTODO NUEVO (ENDPOINT PUT)
+    @PutMapping("/productos/{id}")
+    public ResponseEntity<Producto> actualizarProducto(@PathVariable Long id, @RequestBody Producto producto) {
+        Producto actualizado = productoService.actualizarProducto(id, producto);
+        
+        if (actualizado == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(actualizado);
+    }
 }
