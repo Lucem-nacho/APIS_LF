@@ -1,9 +1,16 @@
 package com.ms_pedidos.pedidos.dto;
-import lombok.Data;
+
 import java.util.List;
 
-@Data
 public class PedidoDto {
-    // No necesitamos enviar el total, lo calculamos en el backend por seguridad
+    // IMPORTANTE: Debe llamarse "items" para coincidir con el JSON de React
     private List<DetalleDto> items;
+
+    public List<DetalleDto> getItems() {
+        return items;
+    }
+
+    public void setItems(List<DetalleDto> items) {
+        this.items = items;
+    }
 }
