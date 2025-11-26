@@ -23,13 +23,20 @@ public class PedidoController {
 
     // Crear pedido
     @PostMapping
+    // OJO AQUÍ: Aseguramos que reciba el Body (JSON) y el Param (Email)
     public ResponseEntity<Pedido> crearPedido(@RequestBody PedidoDto pedidoDto, @RequestParam String email) {
-        // --- CORRECCIÓN AQUÍ: CAMBIAMOS EL ORDEN (Primero email, luego dto) ---
+        
+        // IMPORTANTE: Aquí llamamos al servicio. 
+        // Si te da error en rojo aquí, es porque en el Service están al revés.
+        // Intenta con (email, pedidoDto) o (pedidoDto, email) según lo que pida tu Service.
+        
+        // Opción A (La que corregimos ayer):
         Pedido nuevoPedido = pedidoService.crearPedido(email, pedidoDto); 
+        
         return ResponseEntity.ok(nuevoPedido);
     }
 
-    // Lista (Admin)
+    // Listar (Admin)
     @GetMapping("/admin/all")
     public ResponseEntity<List<Pedido>> listarTodos() {
         return ResponseEntity.ok(pedidoRepository.findAll());
