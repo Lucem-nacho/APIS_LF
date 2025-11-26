@@ -94,4 +94,16 @@ public class ProductoController {
         }
         return ResponseEntity.ok(actualizado);
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> eliminarProducto(@PathVariable Long id) {
+        // Usamos el servicio, que sí está disponible aquí
+        boolean eliminado = productoService.borrarProducto(id);
+        
+        if (eliminado) {
+            return ResponseEntity.noContent().build(); // 204 No Content (Éxito)
+        } else {
+            return ResponseEntity.notFound().build(); // 404 Not Found (No existía)
+        }
+    }
 }

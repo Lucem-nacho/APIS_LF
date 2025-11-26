@@ -1,6 +1,6 @@
 package com.ms_pedidos.pedidos.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference; // <--- IMPORTANTE
+import com.fasterxml.jackson.annotation.JsonIgnore; // <--- USAR ESTE IMPORT
 import jakarta.persistence.*;
 
 @Entity
@@ -16,9 +16,9 @@ public class DetallePedido {
     private Integer cantidad;
     private Double precioUnitario;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pedido_id")
-    @JsonBackReference // <--- ESTO DICE: "No me serialices de vuelta al padre"
+    @JsonIgnore // <--- CAMBIO AQUÍ: Ignoramos al padre para que no se cree un bucle infinito
     private Pedido pedido;
 
     // --- GETTERS Y SETTERS ---

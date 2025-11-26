@@ -1,6 +1,6 @@
 package com.ms_pedidos.pedidos.model;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference; // <--- IMPORTANTE
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -18,8 +18,10 @@ public class Pedido {
     private String estado;
     private LocalDateTime fechaCreacion;
 
-    @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonManagedReference // <--- ESTO DICE: "Yo mando, serialízame a mí"
+    // --- CAMBIO AQUÍ: EAGER en lugar de LAZY ---
+    // Esto obliga a traer los productos asociados inmediatamente, evitando el Error 500
+    @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JsonManagedReference
     private List<DetallePedido> detalles;
 
     // --- GETTERS Y SETTERS ---

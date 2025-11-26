@@ -60,4 +60,12 @@ public class ProductoService {
         return null;
     }
 
+    public boolean borrarProducto(Long id) {
+        if (productoRepository.existsById(id)) {
+            productoRepository.deleteById(id);
+            return true; // Se borró con éxito
+        }
+        return false; // No existía el ID
+    }
+
 }
