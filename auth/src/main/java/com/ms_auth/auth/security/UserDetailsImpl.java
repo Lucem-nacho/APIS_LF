@@ -7,7 +7,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 
 public class UserDetailsImpl implements UserDetails {
 
@@ -19,8 +18,9 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // Convertimos el ROL del usuario a un formato que Spring entienda
-        return Collections.singleton(new SimpleGrantedAuthority(usuario.getRol()));
+        // CAMBIO: Extraemos el nombre desde la entidad Rol
+        String nombreRol = usuario.getRol().getNombre();
+        return Collections.singleton(new SimpleGrantedAuthority(nombreRol));
     }
 
     @Override
@@ -29,7 +29,6 @@ public class UserDetailsImpl implements UserDetails {
     @Override
     public String getUsername() { return usuario.getEmail(); }
 
-    // Métodos de estado de cuenta (ponemos todos true para que no bloqueen)
     @Override public boolean isAccountNonExpired() { return true; }
     @Override public boolean isAccountNonLocked() { return true; }
     @Override public boolean isCredentialsNonExpired() { return true; }

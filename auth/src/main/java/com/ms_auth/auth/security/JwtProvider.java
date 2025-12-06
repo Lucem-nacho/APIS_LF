@@ -25,11 +25,13 @@ public class JwtProvider {
         return Keys.hmacShaKeyFor(secret.getBytes());
     }
 
-    // Generar Token
     public String createToken(Usuario usuario) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("id", usuario.getId());
-        claims.put("rol", usuario.getRol());
+        
+        // --- CAMBIO IMPORTANTE: Obtenemos el nombre del rol (String) ---
+        claims.put("rol", usuario.getRol().getNombre());
+        
         claims.put("nombre", usuario.getNombre());
 
         return Jwts.builder()
@@ -41,7 +43,6 @@ public class JwtProvider {
                 .compact();
     }
 
-    // Validar Token
     public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder().setSigningKey(getSigningKey()).build().parseClaimsJws(token);
@@ -51,7 +52,6 @@ public class JwtProvider {
         }
     }
 
-    // Obtener email del token
     public String getEmailFromToken(String token) {
         return Jwts.parserBuilder().setSigningKey(getSigningKey()).build()
                 .parseClaimsJws(token).getBody().getSubject();

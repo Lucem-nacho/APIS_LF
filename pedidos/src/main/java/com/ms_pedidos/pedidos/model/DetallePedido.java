@@ -1,6 +1,6 @@
 package com.ms_pedidos.pedidos.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore; // <--- USAR ESTE IMPORT
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
@@ -16,9 +16,12 @@ public class DetallePedido {
     private Integer cantidad;
     private Double precioUnitario;
 
+    @Column(name = "usuario_email")
+    private String usuarioEmail;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pedido_id")
-    @JsonIgnore // <--- CAMBIO AQUÍ: Ignoramos al padre para que no se cree un bucle infinito
+    @JsonIgnore 
     private Pedido pedido;
 
     // --- GETTERS Y SETTERS ---
@@ -36,6 +39,9 @@ public class DetallePedido {
 
     public Double getPrecioUnitario() { return precioUnitario; }
     public void setPrecioUnitario(Double precioUnitario) { this.precioUnitario = precioUnitario; }
+
+    public String getUsuarioEmail() { return usuarioEmail; }
+    public void setUsuarioEmail(String usuarioEmail) { this.usuarioEmail = usuarioEmail; }
 
     public Pedido getPedido() { return pedido; }
     public void setPedido(Pedido pedido) { this.pedido = pedido; }

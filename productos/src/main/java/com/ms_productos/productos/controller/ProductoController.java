@@ -2,7 +2,7 @@ package com.ms_productos.productos.controller;
 
 import com.ms_productos.productos.model.Producto;
 import com.ms_productos.productos.service.ProductoService;
-import com.ms_productos.productos.repository.ProductoRepository; // Si lo usas para listar
+import com.ms_productos.productos.repository.ProductoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,7 +11,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/catalog/productos")
-// AQUÍ ESTÁ EL ARREGLO: Permitimos explícitamente DELETE y PUT
 @CrossOrigin(origins = "http://localhost:5173", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
 public class ProductoController {
 
@@ -21,13 +20,11 @@ public class ProductoController {
     @Autowired
     private ProductoRepository productoRepository;
 
-    // Listar todos
     @GetMapping
     public List<Producto> listarProductos() {
         return productoRepository.findAll();
     }
 
-    // Obtener por ID
     @GetMapping("/{id}")
     public ResponseEntity<Producto> obtenerProducto(@PathVariable Long id) {
         return productoRepository.findById(id)
@@ -35,13 +32,11 @@ public class ProductoController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // Crear
     @PostMapping
     public Producto crearProducto(@RequestBody Producto producto) {
         return productoRepository.save(producto);
     }
 
-    // Editar
     @PutMapping("/{id}")
     public ResponseEntity<Producto> actualizarProducto(@PathVariable Long id, @RequestBody Producto detalles) {
         return productoRepository.findById(id)
@@ -57,16 +52,26 @@ public class ProductoController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // --- BORRAR (El que daba error 405) ---
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarProducto(@PathVariable Long id) {
-        // Usamos el servicio que creamos antes
         boolean eliminado = productoService.borrarProducto(id);
-        
         if (eliminado) {
-            return ResponseEntity.noContent().build(); // 204 No Content (Éxito)
+            return ResponseEntity.noContent().build();
         } else {
-            return ResponseEntity.notFound().build(); // 404 Not Found
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    // --- NUEVO ENDPOINT PARA ACTUALIZAR STOCK ---
+    // Este será llamado por el microservicio de PEDIDOS
+    @PutMapping("/{id}/stock")
+    public ResponseEntity<Void> actualizarStock(@PathVariable Long id, @RequestParam int cantidad) {
+        try {
+            productoService.descontarStock(id, cantidad);
+            return ResponseEntity.ok().build();
+        } catch (RuntimeException e) {
+            // Si no hay stock o no existe el producto, devolvemos error 400
+            return ResponseEntity.badRequest().build();
         }
     }
 }

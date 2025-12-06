@@ -19,14 +19,15 @@ public class Usuario {
     private String apellido;
 
     @Column(unique = true, nullable = false)
-    private String email; // Usado como "username"
+    private String email;
 
-    private String telefono; // Puede ser null (opcional)
-    
-    private String direccion; // Puede ser null (opcional)
+    private String telefono;
+    private String direccion;
 
     @Column(nullable = false)
     private String password;
 
-    private String rol; 
+    @ManyToOne(fetch = FetchType.EAGER) 
+    @JoinColumn(name = "rol_id")
+    private Rol rol; 
 }
