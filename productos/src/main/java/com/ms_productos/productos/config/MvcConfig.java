@@ -1,9 +1,10 @@
-package com.ms_productos.productos.config; // Ajusta el paquete si es necesario
+package com.ms_productos.productos.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import java.nio.file.Paths; // <--- NO OLVIDES ESTE IMPORT
 
 @Configuration
 public class MvcConfig implements WebMvcConfigurer {
@@ -19,8 +20,24 @@ public class MvcConfig implements WebMvcConfigurer {
     
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        // Mapea la URL "/images/**" a la carpeta física "uploads" en la raíz del proyecto
+        // --- LÓGICA A PRUEBA DE FALLOS ---
+        // 1. Definimos la ruta base
+        String uploadPath = "uploads/";
+        
+        // 2. Preguntamos dónde se está ejecutando el servidor
+        String currentDir = Paths.get(".").toAbsolutePath().normalize().toString();
+
+        // 3. Si NO termina en "productos", significa que estamos en la carpeta de atrás (APIS_LF)
+        // Por lo tanto, le agregamos el prefijo para entrar a la carpeta correcta.
+        if (!currentDir.endsWith("productos")) {
+            uploadPath = "productos/uploads/";
+        }
+
+        // 4. Configuramos el acceso público a las imágenes
         registry.addResourceHandler("/images/**")
-                .addResourceLocations("file:uploads/");
+                .addResourceLocations("file:" + uploadPath);
+                
+        // Debug para que veas en la consola dónde está buscando (opcional)
+        System.out.println(">>> MvcConfig: Sirviendo imágenes desde: " + uploadPath);
     }
 }

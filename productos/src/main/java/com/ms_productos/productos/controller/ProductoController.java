@@ -6,7 +6,7 @@ import com.ms_productos.productos.repository.ProductoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile; // Importante para archivos
+import org.springframework.web.multipart.MultipartFile;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -25,13 +25,11 @@ public class ProductoController {
     @Autowired
     private ProductoRepository productoRepository;
 
-    // --- LISTAR TODOS ---
     @GetMapping
     public List<Producto> listarProductos() {
         return productoRepository.findAll();
     }
 
-    // --- OBTENER POR ID ---
     @GetMapping("/{id}")
     public ResponseEntity<Producto> obtenerProducto(@PathVariable Long id) {
         return productoRepository.findById(id)
@@ -39,13 +37,11 @@ public class ProductoController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // --- CREAR PRODUCTO ---
     @PostMapping
     public Producto crearProducto(@RequestBody Producto producto) {
         return productoRepository.save(producto);
     }
 
-    // --- ACTUALIZAR PRODUCTO ---
     @PutMapping("/{id}")
     public ResponseEntity<Producto> actualizarProducto(@PathVariable Long id, @RequestBody Producto detalles) {
         return productoRepository.findById(id)
@@ -61,7 +57,6 @@ public class ProductoController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // --- ELIMINAR PRODUCTO ---
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarProducto(@PathVariable Long id) {
         boolean eliminado = productoService.borrarProducto(id);
@@ -72,7 +67,6 @@ public class ProductoController {
         }
     }
 
-    // --- ACTUALIZAR STOCK (Para el microservicio de Pedidos) ---
     @PutMapping("/{id}/stock")
     public ResponseEntity<Void> actualizarStock(@PathVariable Long id, @RequestParam int cantidad) {
         try {
@@ -83,30 +77,35 @@ public class ProductoController {
         }
     }
 
-    // --- NUEVO ENDPOINT: SUBIR IMAGEN ---
+    // --- ENDPOINT MODIFICADO: SUBIDA A PRUEBA DE FALLOS ---
     @PostMapping("/upload")
     public ResponseEntity<String> uploadImage(@RequestParam("file") MultipartFile file) {
         try {
-            // 1. Definir carpeta de destino (en la raíz del proyecto productos)
+            // 1. Lógica inteligente para detectar la carpeta
             String folder = "uploads/";
-            Path path = Paths.get(folder);
-            
-            // Crear carpeta si no existe
-            if (!Files.exists(path)) {
-                Files.createDirectories(path);
+            String currentDir = Paths.get(".").toAbsolutePath().normalize().toString();
+
+            // Si no estamos dentro de "productos", ajustamos la ruta
+            if (!currentDir.endsWith("productos")) {
+                folder = "productos/uploads/";
             }
 
-            // 2. Generar nombre único para evitar que se sobrescriban archivos con el mismo nombre
+            Path path = Paths.get(folder);
+            
+            // 2. Crear carpeta si no existe
+            if (!Files.exists(path)) {
+                Files.createDirectories(path);
+                System.out.println(">>> Carpeta creada en: " + path.toAbsolutePath());
+            }
+
+            // 3. Guardar archivo
             String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
             Path filePath = path.resolve(fileName);
 
-            // 3. Guardar el archivo físico
             Files.copy(file.getInputStream(), filePath);
 
-            // 4. Devolver la URL relativa (que mapeamos en MvcConfig)
-            // Ejemplo: /images/mi-foto-uuid.jpg
+            // 4. Retornar URL pública
             String imageUrl = "/images/" + fileName;
-            
             return ResponseEntity.ok(imageUrl);
 
         } catch (Exception e) {
