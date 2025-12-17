@@ -1,16 +1,12 @@
 package com.ms_pedidos.pedidos.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
 import java.util.List;
 
+@Data
 public class PedidoDto {
-    // IMPORTANTE: Debe llamarse "items" para coincidir con el JSON de React
+
+    @Schema(description = "Lista de productos incluidos en el pedido")
     private List<DetalleDto> items;
-
-    public List<DetalleDto> getItems() {
-        return items;
-    }
-
-    public void setItems(List<DetalleDto> items) {
-        this.items = items;
-    }
 }

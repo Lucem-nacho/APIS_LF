@@ -1,45 +1,42 @@
 package com.ms_pedidos.pedidos.model;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
 @Table(name = "pedidos")
+@Data
 public class Pedido {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Schema(description = "ID único del pedido", example = "105")
     private Long id;
 
+    @Schema(description = "Correo del usuario que realizó la compra", example = "cliente@legacyframes.cl")
     private String usuarioEmail;
-    private Double total;
-    private String estado;
+
+    @Schema(description = "Fecha y hora de la compra", example = "2023-12-01T14:30:00")
     private LocalDateTime fechaCreacion;
 
-    // --- CAMBIO AQUÍ: EAGER en lugar de LAZY ---
-    // Esto obliga a traer los productos asociados inmediatamente, evitando el Error 500
+    @Schema(description = "Estado actual del pedido", example = "CONFIRMADO")
+    private String estado;
+
+    @Schema(description = "Monto total de la compra", example = "65000.0")
+    private Double total;
+
+
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JsonManagedReference
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    @Schema(description = "Lista de productos comprados en este pedido")
     private List<DetallePedido> detalles;
-
-    // --- GETTERS Y SETTERS ---
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-
-    public String getUsuarioEmail() { return usuarioEmail; }
-    public void setUsuarioEmail(String usuarioEmail) { this.usuarioEmail = usuarioEmail; }
-
-    public Double getTotal() { return total; }
-    public void setTotal(Double total) { this.total = total; }
-
-    public String getEstado() { return estado; }
-    public void setEstado(String estado) { this.estado = estado; }
-
-    public LocalDateTime getFechaCreacion() { return fechaCreacion; }
-    public void setFechaCreacion(LocalDateTime fechaCreacion) { this.fechaCreacion = fechaCreacion; }
-
-    public List<DetallePedido> getDetalles() { return detalles; }
-    public void setDetalles(List<DetallePedido> detalles) { this.detalles = detalles; }
 }

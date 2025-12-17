@@ -1,13 +1,12 @@
-// ...existing code...
 package com.ms_contacto.contacto.model;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
 
 import java.time.LocalDateTime;
 
@@ -20,31 +19,28 @@ public class Contacto {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Schema(description = "ID único del mensaje", example = "1")
     private Long id;
 
-    @NotBlank(message = "nombre requerido")
-    @Size(max = 50)
-    @Column(nullable = false, length = 100)
+    @NotBlank(message = "El nombre es obligatorio")
+    @Schema(description = "Nombre de quien envía el mensaje", example = "Juan Pérez")
     private String nombre;
 
-    @NotBlank(message = "email requerido")
-    @Email(message = "email inválido")
-    @Size(max = 50)
-    @Column(nullable = false, length = 150)
+    @Email(message = "Debe ser un email válido")
+    @NotBlank(message = "El email es obligatorio")
+    @Schema(description = "Correo de contacto", example = "juan.perez@example.com")
     private String email;
 
-    @NotBlank(message = "mensaje requerido")
-    @Size(max = 300)
-    @Column(nullable = false, columnDefinition = "TEXT")
+    @NotBlank(message = "El mensaje no puede estar vacío")
+    @Column(length = 1000)
+    @Schema(description = "Contenido del mensaje", example = "Hola, me gustaría cotizar un marco de 50x70cm.")
     private String mensaje;
 
-    @Column(nullable = false)
+    @Schema(description = "Fecha de envío (se genera automáticamente)", example = "2023-12-01T10:00:00")
     private LocalDateTime fechaEnvio;
 
     @PrePersist
-    protected void onCreate() {
-        if (fechaEnvio == null) {
-            fechaEnvio = LocalDateTime.now();
-        }
+    public void prePersist() {
+        this.fechaEnvio = LocalDateTime.now();
     }
 }
